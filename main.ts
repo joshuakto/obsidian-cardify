@@ -1,4 +1,5 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
+import * as path from "path";
 
 // Remember to rename these classes and interfaces!
 
@@ -10,16 +11,111 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	mySetting: 'default'
 }
 
+/**
+ * Extracts the front matter from the content string.
+ *
+ * @param {string} content - The content string to extract front matter from.
+ * @return {string | null} The front matter if found, otherwise null.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function extractFrontMatter(content: string): string | null {
+	const frontMatterMatch = content.match(/^(---\s*\n[\s\S]*?\n?---)/);
+	return frontMatterMatch ? frontMatterMatch[1] : null;
+}
+
+type LinkedBlock = {
+	title: string,
+	link: string
+}
+
+/**
+ * From the given markdown content, extracts annotation blocks, which are separated by an empty line.
+ *
+ * @param {string} content - The markdown content to extract annotation blocks from.
+ * @return {Array<string>} - An array of extracted annotation blocks.
+ */
+function extractAnnotationBlocks(content: string): Array<string> {
+	const annotationBlocks: Array<string> = content.split("\n\n");
+	return annotationBlocks.slice(1);
+}
+
+function extractComment(content: string): string {
+	const match: RegExpMatchArray | null = content.match('(?<=\n>%%COMMENT%%\n>)(.*?)(?=\n)')
+	return match ? match[1] : '';
+}
+
+/**
+ * Extracts the first internal link from the given content.
+ *
+ * @param {string} content - The content to extract the link from.
+ * @return {string | null} - The extracted link or null if no link is found.
+ */
+function extractInternalLink(content: string): string | null {
+	const match: RegExpMatchArray | null = content.match('(?<=\n\\^)(.*?)(?=\n|$)')
+	return match? match[1] : null;
+}
+
+
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
+	async createNewFileContent(activeFile: TFile): Promise<Array<LinkedBlock>|null> {
+		const currentFile: TFile = this.app.vault.getAbstractFileByPath(activeFile.path) as TFile;
+		const fileContent: string = await this.app.vault.read(currentFile);
+		/**
+		 * Might be useful later
+		const frontMatter: string | null = extractFrontMatter(content);
+		// notify users if front Matter does not contain annotation-target as a property
+		if (!frontMatter || !frontMatter.includes('annotation-target')) {
+			new Notice('Active file does not contain annotation-target as file property.')
+			return null
+		}
+		 */
+		const annotationBlocks: Array<string> = extractAnnotationBlocks(fileContent);
+		const links: Array<LinkedBlock> = annotationBlocks.map(
+			(block: string): LinkedBlock => {
+				return {
+					title: extractComment(block),
+					link: '![[' + activeFile.basename + '#^' + extractInternalLink(block) + ']]'
+				};
+			})
+		return links;
+	}
 	async onload() {
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', async (evt: MouseEvent) => {
+			// Check that the active file is a md file
+			const activeFile: TFile | null = this.app.workspace.getActiveFile()
+			if (activeFile === null ) {
+				new Notice('Cannot get active file.')
+				return null
+			}
+			if (activeFile.extension !== 'md') {
+				new Notice('Active file is not a markdown file.')
+				return null
+			}
+			const activeFileBaseName: string = path.basename(activeFile.name, '.md')
+			const activeDir:string = path.dirname(activeFile.path)
+
+			// create folder to store generated md if folder does not exist yet
+			const generatedFolder: string = activeDir + '/' + activeFileBaseName
+			if (!await this.app.vault.adapter.exists(generatedFolder)) {
+				await this.app.vault.createFolder(generatedFolder);
+			}
+
+			// parse file content from activeFile into separate md files
+			const newFileContent = await this.createNewFileContent(activeFile);
+			if (!newFileContent) {return new Notice('No new content');}
+
+			// write parsed content into new md files
+			newFileContent.map(async (lb: LinkedBlock, idx: number) => {
+				// extract comment from the content to use as filename
+				const filename: string  = lb.title === ''? idx.toString() : idx.toString() + '-' + lb.title
+				await this.app.vault.create(generatedFolder + '/' + filename + '.md', lb.link)
+				new Notice('New files stored in ' + generatedFolder)
+			})
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
