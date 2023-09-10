@@ -75,7 +75,6 @@ export function addMissingInternalLink(content: string, separator: string): stri
     const internalLinkRegex = '(?<=\n\\^)(.*?)(?=\n*?$)'
     // setting the g flag for the separator so match returns all matches
 	const separatorList: RegExpMatchArray | null = content.match(gSeparator);
-	console.log(separatorList); // Added
 	// check that the separatorList is one element less than the blocks list
 	if (!separatorList && blocks.length !== 1) {
 		new Notice('Cannot add missing internal link, separator not found but have >1 blocks.')
@@ -100,7 +99,6 @@ export function addMissingInternalLink(content: string, separator: string): stri
 			return block
 		}
 	})
-	console.log(separatorList)
 	return linkedBlocks.join('');
 }
 
