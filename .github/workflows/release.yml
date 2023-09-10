@@ -6,8 +6,8 @@ on:
       - "*"
 
 permissions:
-  contents: read | write
-  actions: read | write
+  contents: read|write
+  actions: read|write
   packages: read
 
 jobs:
