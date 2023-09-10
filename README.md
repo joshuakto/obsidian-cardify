@@ -1,32 +1,26 @@
-# Obsidian Sample Plugin
+# Obsidian Cardify Plugin
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+This is a plugin to separate contents in a markdown, assign links to each separated content, and create subsequent markdowns to store the link. The objective is to make it easier to incorporate markdown contents as cards in canvas.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+Cardify has these basic functionalities
+- Selection of separator (currently only supports two new lines or ---).
+- Detect whether an internal link exists in the content, if not assign automatically.
+- Create a markdown for each separated content (while preserving the frontmatter).
+	- Give an index for the created page based on the position of the separated contents.
+	- Extract comment from content to use as title for the created page	
+- Create a folder to store the created markdown.
+- (to remove) Registers a global click event and output 'click' to the console.
+- (to remove) Registers a global interval which logs 'setInterval' to the console.
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+Planned functionalities
+- Switch for toggling function to automatically assign internal links.
+- List of regex arranged in order of priority to use as title of the created markdown.
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
-
-## First time developing plugins?
-
-Quick starting guide for new plugin devs:
-
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+## How to use
+1. Upon installation, a dice icon will be visible on the ribbon.
+2. Navigate to the markdown file you want to Cardify.
+3. Clicking the dice icon will generate a folder named the same as the active file and store created markdowns in it.
+**Note:** Currently, the plugin will change the content of the markdown when inserting internal link. If the spacing of the document is important, do not use this plugin for now. In the future there will be an option to choose whether you want to modify content of existing files.
 
 ## Releasing new releases
 
@@ -46,50 +40,6 @@ Quick starting guide for new plugin devs:
 - Make sure you have a `README.md` file in the root of your repo.
 - Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
 
-## How to use
-
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
-
-## Manually installing the plugin
-
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
-
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
-
-## Funding URL
-
-You can include funding URLs where people who use your plugin can financially support it.
-
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
-
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
-
-If you have multiple URLs, you can also do:
-
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
 
 ## API Documentation
 
