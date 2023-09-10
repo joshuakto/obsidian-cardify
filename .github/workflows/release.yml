@@ -5,6 +5,11 @@ on:
     tags:
       - "*"
 
+permissions:
+  contents: read | write
+  actions: read
+  packages: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
