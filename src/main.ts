@@ -1,6 +1,6 @@
 import { Editor, MarkdownView, Notice, Plugin, TFile} from 'obsidian';
 import * as path from "path";
-import {addMissingInternalLink, parseCardBlock, parseMDFile} from "./helper";
+import {addMissingInternalLink, parseCardBlock, parseMDFile, removeUnpermittedCharacters} from "./helper";
 import {LinkedBlock} from "./type";
 import CardifySettingTab from "./class/CardifySettingTabClass";
 import SampleModal from "./class/SampleModalClass";
@@ -67,12 +67,19 @@ export default class Cardify extends Plugin {
 			if (!newFileContent) {return new Notice('No new content');}
 
 			// write parsed content into new md files
-			newFileContent.map(async (lb: LinkedBlock, idx: number) => {
-				// extract comment from the content to use as filename
+			let createdFiles = 0 // to keep track of created files
+			const createdContent = newFileContent.map(async (lb: LinkedBlock, idx: number) => {
 				const filename: string = lb.title === '' ? idx.toString() : idx.toString() + '-' + lb.title
-				await this.app.vault.create(generatedFolder + '/' + filename + '.md', lb.link)
+				const filepath: string = removeUnpermittedCharacters(generatedFolder + '/' + filename + '.md');
+				if (await this.app.vault.adapter.exists(filepath)) {
+					new Notice(filepath + ' already exists, skipped overwriting it.')
+				} else {
+					createdFiles++
+					return await this.app.vault.create(filepath, lb.link)
+				}
 			})
-			new Notice('New files stored in ' + generatedFolder)
+			await Promise.all(createdContent)
+			createdFiles > 0 && new Notice(createdFiles + ' new files stored in ' + generatedFolder)
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');

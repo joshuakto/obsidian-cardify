@@ -96,3 +96,8 @@ export function addMissingInternalLink(content: string, separator: string): stri
 	console.log(separatorList)
 	return linkedBlocks.join('');
 }
+
+export function removeUnpermittedCharacters(filename: string): string {
+  const unpermittedCharactersRegex = /[^a-zA-Z0-9_.\-\s/]/g;
+  return filename.replace(unpermittedCharactersRegex, '');
+}
