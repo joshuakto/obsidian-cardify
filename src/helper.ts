@@ -58,10 +58,17 @@ export function parseCardBlock(cardBlock: string, activeFilePath: string): Linke
  * @param {number} length - The desired length of the key.
  * @returns {string} The generated pseudorandom key.
  */
-function generateRandomKey(length = 10): string {
+export function generateRandomKey(length = 10): string {
   return Array.from(Array(length), () => Math.random().toString(36).charAt(2)).join('');
 }
 
+/**
+ * Separate given content into blocks, add internal link if separated blocks does not contain one.
+ *
+ * @param {string} content - The content to process.
+ * @param {string} separator - The separator used to split the content.
+ * @return {string} The processed content with missing internal links added.
+ */
 export function addMissingInternalLink(content: string, separator: string): string {
     const gSeparator = new RegExp(separator, 'g');
     const blocks: Array<string> = content.split(gSeparator);
@@ -97,7 +104,13 @@ export function addMissingInternalLink(content: string, separator: string): stri
 	return linkedBlocks.join('');
 }
 
-export function removeUnpermittedCharacters(filename: string): string {
-  const unpermittedCharactersRegex = /[^a-zA-Z0-9_.\-\s/]/g;
-  return filename.replace(unpermittedCharactersRegex, '');
+/**
+ * Removes any characters not suitable for filenames from the given string.
+ *
+ * @param {string} filename - The string to remove unsuitable characters from.
+ * @return {string} The filename with unsuitable characters removed.
+ */
+export function removeUnsuitableCharacters(filename: string): string {
+  const unsuitableCharactersRegex = /[^a-zA-Z0-9_.\-\s/]/g;
+  return filename.replace(unsuitableCharactersRegex, '');
 }

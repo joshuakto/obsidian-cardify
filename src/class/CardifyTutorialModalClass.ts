@@ -1,6 +1,6 @@
 import {App, Modal} from "obsidian";
 
-export default class SampleModal extends Modal {
+export default class CardifyTutorialModal extends Modal {
 	constructor(app: App) {
 		super(app);
 	}

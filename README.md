@@ -9,12 +9,13 @@ Cardify has these basic functionalities
 	- Give an index for the created page based on the position of the separated contents.
 	- Extract comment from content to use as title for the created page	
 - Create a folder to store the created markdown.
-- (to remove) Registers a global click event and output 'click' to the console.
-- (to remove) Registers a global interval which logs 'setInterval' to the console.
+- Generate and insert an internal link to replace the current selection. 
 
 Planned functionalities
 - Switch for toggling function to automatically assign internal links.
 - List of regex arranged in order of priority to use as title of the created markdown.
+- Allow users to view instruction for using the plugin in a popup modal.
+- Allow users to see the preview for the cards to be generated from the active file.
 
 ## How to use
 1. Upon installation, a dice icon will be visible on the ribbon.
@@ -22,7 +23,8 @@ Planned functionalities
 3. Clicking the dice icon will generate a folder named the same as the active file and store created markdowns in it.
 **Note:** Currently, the plugin will change the content of the markdown when inserting internal link. If the spacing of the document is important, do not use this plugin for now. In the future there will be an option to choose whether you want to modify content of existing files.
 
-## Releasing new releases
+<!--- 
+Releasing new releases
 
 - Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
 - Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
@@ -31,8 +33,9 @@ Planned functionalities
 - Publish the release.
 
 > You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json` 
 
 ## API Documentation
 
 See https://github.com/obsidianmd/obsidian-api
+--->
