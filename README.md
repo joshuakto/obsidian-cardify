@@ -1,6 +1,6 @@
 # Obsidian Cardify Plugin
 
-This is a plugin to separate contents in a markdown, assign links to each separated content, and create subsequent markdowns to store the link. The objective is to make it easier to incorporate markdown contents as cards in canvas.
+Separates contents in a markdown, assign internal links to each separated content, and generate subsequent linked markdowns. Making it easy to drag and drop individual linked markdown files onto canvas.
 
 Cardify has these basic functionalities
 - Selection of separator (currently only supports two new lines or ---).

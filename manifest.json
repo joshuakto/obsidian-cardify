@@ -5,7 +5,7 @@
 	"minAppVersion": "0.15.0",
 	"description": "This is a plugin to cardify markdown contents into subsequent markdown files.",
 	"author": "joshuakto",
-	"authorUrl": "joshuakto@gmail.com",
+	"authorUrl": "https://github.com/joshuakto",
 	"fundingUrl": "https://www.buymeacoffee.com/joshuakto",
 	"isDesktopOnly": false
 }

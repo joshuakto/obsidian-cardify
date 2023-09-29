@@ -1,10 +1,10 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
-import MyPlugin from "../main";
+import Cardify from "../main";
 
 export default class CardifySettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+	plugin: Cardify;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: Cardify) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
