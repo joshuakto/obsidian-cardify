@@ -18,9 +18,9 @@ Planned functionalities
 - Allow users to see the preview for the cards to be generated from the active file.
 
 ## How to use
-1. Upon installation, a dice icon will be visible on the ribbon.
+1. Upon installation, an icon with overlapping squares will be visible on the ribbon.
 2. Navigate to the markdown file you want to Cardify.
-3. Clicking the dice icon will generate a folder named the same as the active file and store created markdowns in it.
+3. Clicking the overlapping squares icon will generate a folder named the same as the active file and store created markdowns in it.
 **Note:** Currently, the plugin will change the content of the markdown when inserting internal link. If the spacing of the document is important, do not use this plugin for now. In the future there will be an option to choose whether you want to modify content of existing files.
 
 ## Acknowledgements

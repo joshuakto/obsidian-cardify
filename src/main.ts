@@ -1,4 +1,4 @@
-import {Editor, MarkdownView, normalizePath, Notice, Plugin, TFile} from 'obsidian';
+import {Editor, MarkdownView, normalizePath, Notice, Plugin, setIcon, TFile} from 'obsidian';
 import {
 	addMissingInternalLink,
 	generateRandomKey,
@@ -17,6 +17,7 @@ const DEFAULT_SETTINGS: CardifySettings = {
 }
 export default class Cardify extends Plugin {
 	settings: CardifySettings;
+	statusBarItemEl: HTMLElement;
 
 	async createNewFileContent(content: string, activeFilePath: string): Promise<Array<LinkedBlock>|null> {
 		const rSeparator = new RegExp(this.settings.separator)
@@ -29,11 +30,12 @@ export default class Cardify extends Plugin {
 				return parseCardBlock(block, activeFilePath);
 			});
 	}
+	
 	async onload() {
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Cardify', async (evt: MouseEvent) => {
+		const ribbonIconEl = this.addRibbonIcon('combine', 'Cardify', async (evt: MouseEvent) => {
 			// Check that the active file is a md file
 			const activeFile: TFile | null = this.app.workspace.getActiveFile()
 			if (activeFile === null ) {
@@ -86,10 +88,10 @@ export default class Cardify extends Plugin {
 			createdFiles > 0 && new Notice(createdFiles + ' new files stored in ' + generatedFolder)
 		});
 		ribbonIconEl.addClass('cardify-ribbon-class');
+		setIcon(ribbonIconEl, 'copy-plus')
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
+		this.statusBarItemEl = this.addStatusBarItem();
 
 		// This adds an editor command that can perform some operation on the current editor instance
 		this.addCommand({
@@ -103,7 +105,35 @@ export default class Cardify extends Plugin {
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CardifySettingTab(this.app, this));
+
+
+		// This adds a function that update the status bar everytime the editor changes
+		this.registerEvent(this.app.workspace.on('editor-change', async () => {
+			const activeFile: TFile | null = this.app.workspace.getActiveFile()
+			if (activeFile === null ) {
+				new Notice('Cannot get active file.')
+				return null
+			}
+			if (activeFile.extension !== 'md') {
+				new Notice('Active file is not a markdown file.')
+				return null
+			}
+			const fileContent: string = await this.app.vault.read(activeFile);
+			const {frontMatter, content}: {frontMatter: string | null, content: string} = parseMDFile(fileContent);
+			const gSeparator = new RegExp(this.settings.separator, 'g');
+    		const blocks: Array<string> = content.split(gSeparator);
+			const nonEmptyBlocks: Array<string> = blocks.filter(
+				(block: string): boolean => block.trim().length > 0
+			)
+			const statusBarText = nonEmptyBlocks.length.toString() + ' cards';
+			console.log(statusBarText)
+			this.statusBarItemEl.setText(statusBarText);
+		}));
 	}
+
+	
+
+	
 
 	onunload() {
 
