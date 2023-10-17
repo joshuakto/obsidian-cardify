@@ -2,6 +2,10 @@
 
 Separates contents in a markdown, assign internal links to each separated content, and generate subsequent linked markdowns. Making it easy to drag and drop individual linked markdown files onto canvas.
 
+## Demo
+https://github.com/joshuakto/obsidian-cardify/assets/34743132/d4291aab-56ed-4fcb-97d4-be7aa64f44da
+
+
 Cardify has these basic functionalities
 - Selection of separator (currently only supports two new lines or ---).
 - Detect whether an internal link exists in the content, if not assign automatically.
@@ -22,6 +26,9 @@ Planned functionalities
 2. Navigate to the markdown file you want to Cardify.
 3. Clicking the overlapping squares icon will generate a folder named the same as the active file and store created markdowns in it.
 **Note:** Currently, the plugin will change the content of the markdown when inserting internal link. If the spacing of the document is important, do not use this plugin for now. In the future there will be an option to choose whether you want to modify content of existing files.
+
+[!["Buy Me A Coffee"](https://cdn.buymeacoffee.com/buttons/v2/default-blue.png)](https://www.buymeacoffee.com/joshuakto)
+
 
 ## Acknowledgements
 This plugin is built using [Obsidian Sample Plugin](https://github.com/obsidianmd/obsidian-sample-plugin) as a template.
