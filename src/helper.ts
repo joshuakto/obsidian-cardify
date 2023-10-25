@@ -59,7 +59,7 @@ export function parseCardBlock(cardBlock: string, activeFilePath: string): Linke
  * @returns {string} The generated pseudorandom key.
  */
 export function generateRandomKey(length = 10): string {
-  return Array.from(Array(length), () => Math.random().toString(36).charAt(2)).join('');
+	return Array.from(Array(length), () => Math.random().toString(36).charAt(2)).join('');
 }
 
 /**
@@ -109,6 +109,6 @@ export function addMissingInternalLink(content: string, separator: string): stri
  * @return {string} The filename with unsuitable characters removed.
  */
 export function removeUnsuitableCharacters(filename: string): string {
-  const unsuitableCharactersRegex = /[^a-zA-Z0-9_.\-\s/]/g;
-  return filename.replace(unsuitableCharactersRegex, '');
+	const unsuitableCharactersRegex = /[^a-zA-Z0-9_.\-\s/]/g;
+	return filename.replace(unsuitableCharactersRegex, '');
 }

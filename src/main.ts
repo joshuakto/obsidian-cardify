@@ -12,7 +12,6 @@ import CardifySettings from "./interface/ICardifySettings";
 
 const DEFAULT_SETTINGS: CardifySettings = {
 	separatorName: 'empty line',
-	// separator: /\n{2,}/, // by default, card are separated by 2 or more new line symbols
 	separator: '\n{2,}', // by default, card are separated by 2 or more new line symbols
 }
 export default class Cardify extends Plugin {
@@ -46,17 +45,23 @@ export default class Cardify extends Plugin {
 				new Notice('Active file is not a markdown file.')
 				return null
 			}
+			const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+			if (!activeView) {
+				new Notice('Unable to get active view, place cursor on file content to get active view.')
+				return null
+			}
+			const editor = activeView.editor;
+
 			const activeFileBaseName: string = activeFile.basename
-			const activeDir:string = activeFile.parent? activeFile.parent.path : ''
+			const parentDir:string = activeFile.parent? activeFile.parent.path : ''
+
 
 			// create folder to store generated md if folder does not exist yet
-			const generatedFolder: string = activeDir + '/' + activeFileBaseName
-			if (!await this.app.vault.adapter.exists(generatedFolder)) {
-				await this.app.vault.createFolder(generatedFolder);
-			}
+			const parentFolder: string = parentDir==='/'? '/' : (parentDir + '/')
+			const generatedFolder: string = parentFolder + activeFileBaseName + '-cardify-generated/'
 
-			// extract file frontmatter and content from activeFile
-			const fileContent: string = await this.app.vault.read(activeFile);
+			// extract file frontmatter and content from file content
+			const fileContent: string = editor.getValue();
 			const {frontMatter, content}: {frontMatter: string | null, content: string} = parseMDFile(fileContent);
 
 			// edit content to add missing internal link
@@ -64,13 +69,16 @@ export default class Cardify extends Plugin {
 			const linkedContent: string = addMissingInternalLink(content, this.settings.separator)
 
 			// add internal link to blocks if a link is not detected for a block (link is in the form of \n^<id>)
-			await this.app.vault.process(activeFile, (data: string) => {
-				return frontMatterString + linkedContent
-			});
+			editor.setValue(frontMatterString + linkedContent)
 
 			// parse file content from activeFile into separate md files
 			const newFileContent = await this.createNewFileContent(linkedContent, activeFile.path);
-			if (!newFileContent) {return new Notice('No new content');}
+			if (!newFileContent || newFileContent.length===0) {return new Notice('No new content');}
+
+			// make sure folder exists to store the generated md files storing the linked content
+			if (!await this.app.vault.adapter.exists(generatedFolder)) {
+				await this.app.vault.createFolder(generatedFolder);
+			}
 
 			// write parsed content into new md files
 			let createdFiles = 0 // to keep track of created files
@@ -118,26 +126,25 @@ export default class Cardify extends Plugin {
 				new Notice('Active file is not a markdown file.')
 				return null
 			}
-			const fileContent: string = await this.app.vault.read(activeFile);
-			const {frontMatter, content}: {frontMatter: string | null, content: string} = parseMDFile(fileContent);
+			const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+			if (!activeView) {
+				new Notice('Cannot get active view of type MarkdownView.')
+				return null
+			}
+			const editor = activeView.editor;
+			const fileContent: string = editor.getValue();
+			const {content}: {frontMatter: string | null, content: string} = parseMDFile(fileContent);
 			const gSeparator = new RegExp(this.settings.separator, 'g');
-    		const blocks: Array<string> = content.split(gSeparator);
+			const blocks: Array<string> = content.split(gSeparator);
 			const nonEmptyBlocks: Array<string> = blocks.filter(
 				(block: string): boolean => block.trim().length > 0
 			)
 			const statusBarText = nonEmptyBlocks.length.toString() + ' cards';
-			console.log(statusBarText)
 			this.statusBarItemEl.setText(statusBarText);
 		}));
 	}
 
-	
-
-	
-
-	onunload() {
-
-	}
+	onunload() {}
 
 	async loadSettings() {
 		this.settings = DEFAULT_SETTINGS
