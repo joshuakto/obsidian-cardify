@@ -1,7 +1,7 @@
 {
 	"id": "cardify",
 	"name": "Cardify",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"minAppVersion": "0.15.0",
 	"description": "This is a plugin to cardify markdown contents into subsequent markdown files.",
 	"author": "joshuakto",
