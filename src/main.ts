@@ -1,4 +1,4 @@
-import {Editor, MarkdownView, normalizePath, Notice, Plugin, setIcon, TFile} from 'obsidian';
+import {Editor, MarkdownView, normalizePath, Notice, Plugin, TFile} from 'obsidian';
 import {
 	addMissingInternalLink,
 	generateRandomKey,
@@ -29,74 +29,77 @@ export default class Cardify extends Plugin {
 				return parseCardBlock(block, activeFilePath);
 			});
 	}
+
+	async genCardsFromFile() {
+		// Check that the active file is a md file
+		const activeFile: TFile | null = this.app.workspace.getActiveFile()
+		if (activeFile === null ) {
+			new Notice('Cannot get active file.')
+			return null
+		}
+		if (activeFile.extension !== 'md') {
+			new Notice('Active file is not a markdown file.')
+			return null
+		}
+		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if (!activeView) {
+			new Notice('Unable to get active view, place cursor on file content to get active view.')
+			return null
+		}
+		const editor = activeView.editor;
+
+		const activeFileBaseName: string = activeFile.basename
+		const parentDir:string = activeFile.parent? activeFile.parent.path : ''
+
+
+		// create folder to store generated md if folder does not exist yet
+		const parentFolder: string = parentDir==='/'? '/' : (parentDir + '/')
+		const generatedFolder: string = parentFolder + activeFileBaseName + '-cardify-generated/'
+
+		// extract file frontmatter and content from file content
+		const fileContent: string = editor.getValue();
+		const {frontMatter, content}: {frontMatter: string | null, content: string} = parseMDFile(fileContent);
+
+		// edit content to add missing internal link
+		const frontMatterString: string = frontMatter? frontMatter : '';
+		const linkedContent: string = addMissingInternalLink(content, this.settings.separator)
+
+		// add internal link to blocks if a link is not detected for a block (link is in the form of \n^<id>)
+		editor.setValue(frontMatterString + linkedContent)
+
+		// parse file content from activeFile into separate md files
+		const newFileContent = await this.createNewFileContent(linkedContent, activeFile.path);
+		if (!newFileContent || newFileContent.length===0) {return new Notice('No new content');}
+
+		// make sure folder exists to store the generated md files storing the linked content
+		if (!await this.app.vault.adapter.exists(generatedFolder)) {
+			await this.app.vault.createFolder(generatedFolder);
+		}
+
+		// write parsed content into new md files
+		let createdFiles = 0 // to keep track of created files
+		const createdContent = newFileContent.map(async (lb: LinkedBlock, idx: number) => {
+			const filename: string = lb.title === '' ? idx.toString() : idx.toString() + '-' + lb.title
+			const filepath: string = normalizePath(removeUnsuitableCharacters(generatedFolder + '/' + filename + '.md'));
+			if (await this.app.vault.adapter.exists(filepath)) {
+				new Notice(filepath + ' already exists, skipped overwriting it.')
+			} else {
+				createdFiles++
+				return await this.app.vault.create(filepath, lb.link)
+			}
+		})
+		await Promise.all(createdContent)
+		createdFiles > 0 && new Notice(createdFiles + ' new files stored in ' + generatedFolder)
+	}
 	
 	async onload() {
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('combine', 'Cardify', async (evt: MouseEvent) => {
-			// Check that the active file is a md file
-			const activeFile: TFile | null = this.app.workspace.getActiveFile()
-			if (activeFile === null ) {
-				new Notice('Cannot get active file.')
-				return null
-			}
-			if (activeFile.extension !== 'md') {
-				new Notice('Active file is not a markdown file.')
-				return null
-			}
-			const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
-			if (!activeView) {
-				new Notice('Unable to get active view, place cursor on file content to get active view.')
-				return null
-			}
-			const editor = activeView.editor;
-
-			const activeFileBaseName: string = activeFile.basename
-			const parentDir:string = activeFile.parent? activeFile.parent.path : ''
-
-
-			// create folder to store generated md if folder does not exist yet
-			const parentFolder: string = parentDir==='/'? '/' : (parentDir + '/')
-			const generatedFolder: string = parentFolder + activeFileBaseName + '-cardify-generated/'
-
-			// extract file frontmatter and content from file content
-			const fileContent: string = editor.getValue();
-			const {frontMatter, content}: {frontMatter: string | null, content: string} = parseMDFile(fileContent);
-
-			// edit content to add missing internal link
-			const frontMatterString: string = frontMatter? frontMatter : '';
-			const linkedContent: string = addMissingInternalLink(content, this.settings.separator)
-
-			// add internal link to blocks if a link is not detected for a block (link is in the form of \n^<id>)
-			editor.setValue(frontMatterString + linkedContent)
-
-			// parse file content from activeFile into separate md files
-			const newFileContent = await this.createNewFileContent(linkedContent, activeFile.path);
-			if (!newFileContent || newFileContent.length===0) {return new Notice('No new content');}
-
-			// make sure folder exists to store the generated md files storing the linked content
-			if (!await this.app.vault.adapter.exists(generatedFolder)) {
-				await this.app.vault.createFolder(generatedFolder);
-			}
-
-			// write parsed content into new md files
-			let createdFiles = 0 // to keep track of created files
-			const createdContent = newFileContent.map(async (lb: LinkedBlock, idx: number) => {
-				const filename: string = lb.title === '' ? idx.toString() : idx.toString() + '-' + lb.title
-				const filepath: string = normalizePath(removeUnsuitableCharacters(generatedFolder + '/' + filename + '.md'));
-				if (await this.app.vault.adapter.exists(filepath)) {
-					new Notice(filepath + ' already exists, skipped overwriting it.')
-				} else {
-					createdFiles++
-					return await this.app.vault.create(filepath, lb.link)
-				}
-			})
-			await Promise.all(createdContent)
-			createdFiles > 0 && new Notice(createdFiles + ' new files stored in ' + generatedFolder)
+			this.genCardsFromFile()
 		});
 		ribbonIconEl.addClass('cardify-ribbon-class');
-		setIcon(ribbonIconEl, 'copy-plus')
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		this.statusBarItemEl = this.addStatusBarItem();
@@ -110,6 +113,15 @@ export default class Cardify extends Plugin {
 				editor.replaceSelection('^' + generateRandomKey());
 			}
 		});
+
+		this.addCommand({
+			id: 'generate-file-cards',
+			name: 'Generate cards for current file',
+			icon: 'combine',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				this.genCardsFromFile()
+			}
+		})
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CardifySettingTab(this.app, this));
