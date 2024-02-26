@@ -96,7 +96,7 @@ export default class Cardify extends Plugin {
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('combine', 'Cardify', async (evt: MouseEvent) => {
+		const ribbonIconEl = this.addRibbonIcon('copy-plus', 'Cardify', async (evt: MouseEvent) => {
 			this.genCardsFromFile()
 		});
 		ribbonIconEl.addClass('cardify-ribbon-class');
@@ -117,7 +117,7 @@ export default class Cardify extends Plugin {
 		this.addCommand({
 			id: 'generate-file-cards',
 			name: 'Generate cards for current file',
-			icon: 'combine',
+			icon: 'copy-plus',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				this.genCardsFromFile()
 			}
