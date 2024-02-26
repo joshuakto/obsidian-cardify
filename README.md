@@ -3,7 +3,21 @@
 Separates contents in a markdown, assign internal links to each separated content, and generate subsequent linked markdowns. Making it easy to drag and drop individual linked markdown files onto canvas.
 
 ## Demo
+### Desktop (Mac)
 https://github.com/joshuakto/obsidian-cardify/assets/34743132/d4291aab-56ed-4fcb-97d4-be7aa64f44da
+
+### iPadOS
+Adding cardify generate card command to toolbar and using added shortcut.
+
+
+https://github.com/joshuakto/obsidian-cardify/assets/34743132/7a89dc28-dfe2-4ed3-a328-c2f91f6f1dd7
+
+
+### Android
+Using ribbon bar icon to trigger generation of cards on android app.
+
+https://github.com/joshuakto/obsidian-cardify/assets/34743132/9fe9f0c8-64a8-4a7d-85de-3217b2c09d5c
+
 
 
 Cardify has these basic functionalities
