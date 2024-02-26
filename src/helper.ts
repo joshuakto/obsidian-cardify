@@ -1,4 +1,3 @@
-import * as path from "path";
 import {Content, LinkedBlock} from "./type";
 import {Notice} from "obsidian";
 
@@ -39,6 +38,18 @@ function extractInternalLink(content: string): string | null {
 }
 
 /**
+ * Extracts the basename from a file path.
+ *
+ * @param {string} filePath - The full path to the file.
+ * @return {string} The basename of the file.
+ */
+function extractPathBasename(filePath: string): string {
+    // This regex matches the last part of the path after the last slash, accounting for both forward and backward slashes.
+    const match = filePath.match(/[^\\/]+$/);
+    return match ? match[0] : '';
+}
+
+/**
  * Parses a card block and returns a LinkedBlock object.
  *
  * @param {string} cardBlock - The card block to parse.
@@ -48,7 +59,7 @@ function extractInternalLink(content: string): string | null {
 export function parseCardBlock(cardBlock: string, activeFilePath: string): LinkedBlock {
 	return {
 		title: extractComment(cardBlock),
-		link: '![[' + path.basename(activeFilePath) + '#^' + extractInternalLink(cardBlock) + ']]'
+		link: '![[' + extractPathBasename(activeFilePath) + '#^' + extractInternalLink(cardBlock) + ']]'
 	};
 }
 
