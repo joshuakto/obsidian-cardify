@@ -1,6 +1,6 @@
 {
 	"name": "Cardify",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "This is a plugin to cardify markdown contents, given a markdown file, it will separate contents using the selected separator and generate a new markdown file for each separated content.",
 	"main": "main.js",
 	"scripts": {
