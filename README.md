@@ -1,4 +1,4 @@
-![copy-plus](https://github.com/joshuakto/obsidian-cardify/assets/34743132/4ecabc7b-2498-4128-94a3-a3e5b1ddd82d)# Obsidian Cardify Plugin
+# Obsidian Cardify Plugin ![copy-plus](https://github.com/joshuakto/obsidian-cardify/assets/34743132/4ecabc7b-2498-4128-94a3-a3e5b1ddd82d)
 
 Separates contents in a markdown, assign internal links to each separated content, and generate subsequent linked markdowns. Making it easy to drag and drop individual linked markdown files onto canvas.
 
