@@ -1,4 +1,4 @@
-# Obsidian Cardify Plugin
+![copy-plus](https://github.com/joshuakto/obsidian-cardify/assets/34743132/4ecabc7b-2498-4128-94a3-a3e5b1ddd82d)# Obsidian Cardify Plugin
 
 Separates contents in a markdown, assign internal links to each separated content, and generate subsequent linked markdowns. Making it easy to drag and drop individual linked markdown files onto canvas.
 
@@ -36,9 +36,9 @@ Planned functionalities
 - Allow users to see the preview for the cards to be generated from the active file.
 
 ## How to use
-1. Upon installation, an icon with overlapping squares will be visible on the ribbon.
+1. Upon installation, ![an icon with overlapping squares(copy-plus)](https://github.com/joshuakto/obsidian-cardify/assets/34743132/a1c0a848-f8da-4f67-a7a7-8458f0f9320e) will be visible on the ribbon.
 2. Navigate to the markdown file you want to Cardify.
-3. Clicking the overlapping squares icon will generate a folder named the same as the active file and store created markdowns in it.
+3. Clicking ![the icon with overlapping squares(copy-plus)](https://github.com/joshuakto/obsidian-cardify/assets/34743132/a1c0a848-f8da-4f67-a7a7-8458f0f9320e) will generate a folder named the same as the active file and store created markdowns in it.
 **Note:** Currently, the plugin will change the content of the markdown when inserting internal link. If the spacing of the document is important, do not use this plugin for now. In the future there will be an option to choose whether you want to modify content of existing files.
 
 [!["Buy Me A Coffee"](https://cdn.buymeacoffee.com/buttons/v2/default-blue.png)](https://www.buymeacoffee.com/joshuakto)
